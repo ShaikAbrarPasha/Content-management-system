@@ -21,7 +21,9 @@ public class UserRequestDTO {
 	@Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$",
 	         message = "Password must" + " contain at least one letter, one number, one special character")
 	private String password;
+	
 
+	
 	public String getUserName() {
 		return userName;
 	}

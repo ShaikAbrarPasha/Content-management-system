@@ -1,18 +1,23 @@
 package com.example.cms.serviceImpl;
 
 
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.cms.exception.UserAlreadyExistByEmailException;
+
+import com.example.cms.exception.UserNotFoundByIdException;
 import com.example.cms.model.User;
 import com.example.cms.repository.UserRepository;
 import com.example.cms.responseDTO.UserResponse;
 import com.example.cms.service.UserService;
 import com.example.cms.userDTO.UserRequestDTO;
 import com.example.cms.utility.ResponseStructure;
+
+import jakarta.validation.Valid;
 
 @Service
 
@@ -56,7 +61,37 @@ public class UserServiceImpl implements UserService{
 		user.setEmail(userRequest.getEmail());
 		user.setPassword(pass.encode(userRequest.getPassword()));
 		user.setUserName(userRequest.getUserName());
+		user.setDeleted(false);
 		return user;
 	}
+
+//
+	@Override
+	public ResponseEntity<ResponseStructure<UserResponse>> deleteUser( int userId) {
+		return userRepo.findById(userId).map(user ->{
+			user.setDeleted(true);
+			user = userRepo.save(user);
+			UserResponse userResponse =mapToUserResponse(user);
+			return ResponseEntity.ok(structure.setStatusCode(HttpStatus.OK.value())
+					              .setMessage("User Id is deleted").setBody(userResponse));
+					              })
+					              .orElseThrow(()-> new UserNotFoundByIdException("User Id Not deleted"));
+	
+		
+	}
+
+
+	@Override
+	public ResponseEntity<ResponseStructure<UserResponse>> findByUserId(int userId) {
+		
+		return userRepo.findById(userId).map(user->{
+			UserResponse userResponse =mapToUserResponse(user);
+			return ResponseEntity.ok(structure.setStatusCode(HttpStatus.OK.value())
+		              .setMessage("User Id is not Found").setBody(userResponse));	
+		})
+				.orElseThrow(()-> new UserNotFoundByIdException("User Id Not Found"));
+	}
+	
+	
 	
 }

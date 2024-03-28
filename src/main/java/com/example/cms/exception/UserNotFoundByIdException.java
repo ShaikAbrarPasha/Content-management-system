@@ -1,6 +1,6 @@
 package com.example.cms.exception;
 
-public class UserNotFoundByIdException {
+public class UserNotFoundByIdException extends RuntimeException {
 	private String message;
 
 	public UserNotFoundByIdException(String message) {
